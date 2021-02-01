@@ -1,4 +1,4 @@
-const rr = require('./router');
+const router = require('./router');
 const express = require('express');
 const UserModel = require('./schemas/user');
 const bodyParser= require('body-parser');
@@ -9,7 +9,6 @@ const Errors = require('./errors');
 
 
 (async function () {
-    //new Database();
     const app = express();
     config = await loadConfig();
     app.use(cors());
@@ -17,14 +16,17 @@ const Errors = require('./errors');
     app.use(bodyParser.json());
     app.use(config.baseUrl, async (req, res, next) => {
         if (await checkAccess(req)) {
+            console.log('Authorized')
             return next();
         }
         else{
-            return next(Errors.Forbidden);
+            return res.status(Errors.Forbidden.code).send(Errors.Forbidden);
         }
     });
-    
-    app.use(config.baseUrl.toString(), await rr);  
+
+    //app.use(config.baseUrl.toString(), await router.rr);
+    app.use(config.baseUrl.toString(), router);
+
     server = http.createServer(app);
     const expressSwagger = require("express-swagger-generator")(app);
     let options = {
@@ -37,7 +39,8 @@ const Errors = require('./errors');
             host: 'localhost',
             basePath: '/ingenieriaydesarrollo/api/v1/',
             produces: [
-                "application/json"
+                "application/json",
+                "application/xml"
             ],
             schemes: ['http'],
             securityDefinitions: {
@@ -45,7 +48,7 @@ const Errors = require('./errors');
                     type: 'apiKey',
                     in: 'header',
                     name: 'Authorization',
-                    description: "",
+                    description: "User ID",
                 }
             }
         },
@@ -55,8 +58,7 @@ const Errors = require('./errors');
     expressSwagger(options)
 
     server.listen(config.port);
-    console.log(`Ingenieria Web API running at port ${ config.port }`);
-
+    console.log(`Ingenieria Web API running at port ${ config.port }`);;
 }());
 
 
@@ -70,8 +72,8 @@ async function checkAccess(request) {
         return true;
     }
     else if (headerValue!==undefined && headerValue.startsWith("Bearer ")) {
-        const user = await UserModel.findOne({token: headerValue.split(" ")[1]}).exec();
-        console.log(user);
+        const user = await UserModel.findOne({_id: headerValue.split(" ")[1]}).exec();
+        //console.log(user);
         if(user !== null && user.token !== null){
             return true;
         }
