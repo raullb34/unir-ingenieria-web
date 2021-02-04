@@ -8,9 +8,9 @@ class Error {
 }
 
 const Forbidden = new Error (403,'This operation needs authentiction');
-const InvalidAuthParams = new Error (419,'Invalid auth params, provide some valid');
-const ErrorInSave = new Error(512, 'Error saving in database');
+const InvalidAuthParams = new Error (401,'Invalid auth params, provide some valid');
+const BadRequest = new Error(400, 'Error in request');
 const FileNotFound = new Error(404, 'Document not found');
 const NoContent = new Error(204, 'No content');
 
-module.exports = {Forbidden, InvalidAuthParams, ErrorInSave, FileNotFound, NoContent}
+module.exports = {Forbidden, InvalidAuthParams, BadRequest, FileNotFound, NoContent}

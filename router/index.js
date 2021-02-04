@@ -14,12 +14,12 @@ router.get('/health', async(req, res, next) => {
     return res.status(200).send({ "status": "ok" })
 });
 /**
- * @route POST /auth
- * @group user - User operations
- * @returns {object} 200 - Id user
- * @returns {object} 419 - Invalid Auth Params
- */
-router.post("/auth", async(req, res, next) => {
+* @route POST /auth
+* @group user - User operations
+* @returns {object} 200 - Id user
+* @returns {object} 401 - Invalid Auth Params
+*/
+router.post("/auth", async (req, res, next) => {
     //Check email and password 
     console.log(req.body);
     const email = req.body.email;
@@ -36,18 +36,19 @@ router.post("/auth", async(req, res, next) => {
     }
 });
 /**
- * @route POST /users
- * @group user - User operations
- * @returns {User} 200 - New user saved in database
- * @returns {object} 512 - Error saving
- */
-router.post("/users", async(req, res, next) => {
+* @route POST /users
+* @group user - User operations
+* @returns {User} 200 - New user saved in database
+* @returns {object} 400 - Bad Request
+*/
+router.post("/users", async (req, res, next) => {
     const user = new UserModel(req.body);
     try {
         await user.save();
         return res.status(200).send(user);
-    } catch (err) {
-        return res.status(Errors.ErrorInSave.code).send(Errors.ErrorInSave);
+    }
+    catch (err){
+        return res.status(Errors.BadRequest.code).send(Errors.BadRequest);
     }
 });
 /**
@@ -105,13 +106,13 @@ router.get("/products", async(req, res, next) => {
     });
 });
 /**
- * @route POST /products
- * @group product - Product operations
- * @returns {Product} 200 - Product saved in database
- * @returns {object} 512 - Error saving
- * @security JWT
- */
-router.post("/products", async(req, res, next) => {
+* @route POST /products
+* @group product - Product operations
+* @returns {Product} 200 - Product saved in database
+* @returns {object} 400 - Bad Request
+* @security JWT
+*/
+router.post("/products", async (req, res, next) => {
     const product = new ProductModel(req.body);
     if (product) {
         try {
@@ -119,10 +120,11 @@ router.post("/products", async(req, res, next) => {
             await UserModel.findOneAndUpdate({ _id: req.headers["authorization"].split(" ")[1] }, { $push: { products: product._id } })
             return res.status(200).send(product);
         } catch (error) {
-            return res.status(Errors.ErrorInSave.code).send(Errors.ErrorInSave);
+            return res.status(Errors.BadRequest.code).send(Errors.BadRequest);
         }
-    } else {
-        return res.status(Errors.ErrorInSave.code).send(Errors.ErrorInSave);
+    }
+    else {
+        return res.status(Errors.BadRequest.code).send(Errors.BadRequest);
     }
 });
 /**
