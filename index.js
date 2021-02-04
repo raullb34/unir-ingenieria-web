@@ -56,9 +56,9 @@ const Errors = require('./errors');
         files: ['./router/**/*.js', './schemas/**/*.js'] //Path to the API handle folder
     };
     expressSwagger(options)
-
-    server.listen(config.port);
-    console.log(`Ingenieria Web API running at port ${ config.port }`);;
+    var port = normalizePort(process.env.PORT || '3000');
+    server.listen(port);
+    console.log(`Ingenieria Web API running at port ${ port }`);;
 }());
 
 function normalizePort(val) {
