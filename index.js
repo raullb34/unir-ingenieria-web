@@ -61,7 +61,21 @@ const Errors = require('./errors');
     console.log(`Ingenieria Web API running at port ${ config.port }`);;
 }());
 
+function normalizePort(val) {
+    var port = parseInt(val, 10);
 
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
 
 
 async function checkAccess(request) {
